@@ -18,7 +18,7 @@ class Homestead
     config.vm.hostname = settings["hostname"] ||= "homestead"
 
     # Configure A Private Network IP
-    config.vm.network :private_network, ip: settings["ip"] ||= "192.168.10.10"
+    config.vm.network :private_network, ip: settings["ip"] ||= "192.168.10.22"
 
     # Configure Additional Networks
     if settings.has_key?("networks")
@@ -31,7 +31,7 @@ class Homestead
     config.vm.provider "virtualbox" do |vb|
       vb.name = settings["name"] ||= "homestead-7"
       vb.customize ["modifyvm", :id, "--memory", settings["memory"] ||= "2048"]
-      vb.customize ["modifyvm", :id, "--cpus", settings["cpus"] ||= "1"]
+      vb.customize ["modifyvm", :id, "--cpus", settings["cpus"] ||= "2"]
       vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
       vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
       vb.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -110,7 +110,7 @@ class Homestead
 
     # Register All Of The Configured Shared Folders
     if settings.include? 'folders'
-      settings["folders"].each do |folder|
+      settings["folders"].each_with_index do |folder, index|
         mount_opts = []
 
         if (folder["type"] == "nfs")
@@ -123,15 +123,24 @@ class Homestead
         # Double-splat (**) operator only works with symbol keys, so convert
         options.keys.each{|k| options[k.to_sym] = options.delete(k) }
 
+        # When "vagrant-bindfs" is available and folder type is nfs apply bindfs
+        if folder["type"] == "nfs" and Vagrant.has_plugin?("vagrant-bindfs")
+          config.vm.synced_folder folder["map"], "/mnt/vagrant-#{index}", type: folder["type"] ||= nil, **options
+          config.bindfs.bind_folder "/mnt/vagrant-#{index}", "#{folder['to']}", owner: folder["bindfs"]["owner"], group: folder["bindfs"]["group"], perms: "#{folder["bindfs"]["permissions"]}"
+        else
         config.vm.synced_folder folder["map"], folder["to"], type: folder["type"] ||= nil, **options
       end
+    end
+
+    # Disable "vagrant-vbguest" plugins auto update
+    if Vagrant.has_plugin?("vagrant-vbguest")
+      config.vbguest.auto_update = false
     end
 
     # Install All The Configured Nginx Sites
     config.vm.provision "shell" do |s|
         s.path = scriptDir + "/clear-nginx.sh"
     end
-
 
     settings["sites"].each do |site|
       type = site["type"] ||= "laravel"
