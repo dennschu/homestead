@@ -128,7 +128,8 @@ class Homestead
           config.vm.synced_folder folder["map"], "/mnt/vagrant-#{index}", type: folder["type"] ||= nil, **options
           config.bindfs.bind_folder "/mnt/vagrant-#{index}", "#{folder['to']}", owner: folder["bindfs"]["owner"], group: folder["bindfs"]["group"], perms: "#{folder["bindfs"]["permissions"]}"
         else
-        config.vm.synced_folder folder["map"], folder["to"], type: folder["type"] ||= nil, **options
+          config.vm.synced_folder folder["map"], folder["to"], type: folder["type"] ||= nil, **options
+        end
       end
     end
 
