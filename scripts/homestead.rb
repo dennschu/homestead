@@ -228,5 +228,11 @@ class Homestead
         ]
       end
     end
+
+    # Install & Configure php xdebug
+    config.vm.provision "shell" do |s|
+        s.path = scriptDir + "/install-xdebug.sh"
+    end
+
   end
 end
