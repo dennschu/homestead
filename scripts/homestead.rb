@@ -1,10 +1,14 @@
 class Homestead
-  def Homestead.configure(config, settings)
+  def Homestead.configure(config, settings, projectRootPath)
     # Set The VM Provider
     ENV['VAGRANT_DEFAULT_PROVIDER'] = settings["provider"] ||= "virtualbox"
 
     # Configure Local Variable To Access Scripts From Remote Location
     scriptDir = File.dirname(__FILE__)
+
+    # Load optionally local configuration
+    local_config_path = File.expand_path( projectRootPath + '/local-vagrant-configuration.yaml')
+    local_config = ( File.exists? local_config_path ) ? YAML::load(File.read( local_config_path )) : Hash.new
 
     # Prevent TTY Errors
     config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
@@ -89,6 +93,7 @@ class Homestead
 
     # Configure The Public Key For SSH Access
     if settings.include? 'authorize'
+      # @todo iterate over public keys when of type array
       if File.exists? File.expand_path(settings["authorize"])
         config.vm.provision "shell" do |s|
           s.inline = "echo $1 | grep -xq \"$1\" /home/vagrant/.ssh/authorized_keys || echo $1 | tee -a /home/vagrant/.ssh/authorized_keys"
@@ -100,6 +105,7 @@ class Homestead
     # Copy The SSH Private Keys To The Box
     if settings.include? 'keys'
       settings["keys"].each do |key|
+        # @todo check for private key existence
         config.vm.provision "shell" do |s|
           s.privileged = false
           s.inline = "echo \"$1\" > /home/vagrant/.ssh/$2 && chmod 600 /home/vagrant/.ssh/$2"
@@ -231,9 +237,30 @@ class Homestead
     end
 
     # Install & Configure php xdebug
-    config.vm.provision "shell" do |s|
-        s.path = scriptDir + "/install-xdebug.sh"
+    if File.exists? scriptDir + "/xdebug/xdebug-install.sh"
+      config.vm.provision "shell" do |s|
+          s.path = scriptDir + "/xdebug/xdebug-install.sh"
+      end
     end
+
+    if File.exists? scriptDir + "/xdebug/xdebug-enable.sh" and local_config.include? 'xdebug'
+      config.vm.provision "shell" do |s|
+          s.path = scriptDir + "/xdebug/xdebug-enable.sh"
+          s.args = [
+            local_config["xdebug"]["fpm"]["enabled"],
+            local_config["xdebug"]["cli"]["enabled"],
+            "false"
+          ]
+      end
+    end
+
+    # @todo enable xdebug profiler
+    #if File.exists? scriptDir + "/xdebug/xdebug-profiler-enable.sh"
+    #  config.vm.provision "shell" do |s|
+    #      s.path = scriptDir + "/xdebug/xdebug-profiler-enable"
+    #      s.args = [ "true", "true", "" ]
+    #  end
+    #end
 
   end
 end

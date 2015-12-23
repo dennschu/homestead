@@ -1,0 +1,9 @@
+xdebug:
+  fpm:
+    enabled:        'true'
+  cli:
+    enabled:        'true'
+  profiler:
+    enabled:        'false'
+    log_sub_path:   '_logs'
+
