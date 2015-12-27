@@ -49,7 +49,8 @@ class MakeCommand extends Command
             ->addOption('ip', null, InputOption::VALUE_OPTIONAL, 'The IP address of the virtual machine.')
             ->addOption('after', null, InputOption::VALUE_NONE, 'Determines if the after.sh file is created.')
             ->addOption('aliases', null, InputOption::VALUE_NONE, 'Determines if the aliases file is created.')
-            ->addOption('example', null, InputOption::VALUE_NONE, 'Determines if a Homestead.yaml.example file is created.');
+            ->addOption('example', null, InputOption::VALUE_NONE, 'Determines if a Homestead.yaml.example file is created.')
+            ->addOption('local-config', null, InputOption::VALUE_NONE, 'Create a local Homestead config file');
     }
 
     /**
@@ -96,8 +97,14 @@ class MakeCommand extends Command
         }
 
         if ($input->getOption('example')) {
-            if (! file_exists($this->basePath.'/Homestead.yaml.example')) {
-                copy($this->basePath.'/Homestead.yaml', $this->basePath.'/Homestead.yaml.example');
+            if (! file_exists($this->basePath.'/Homestead-local.yaml')) {
+              copy( __DIR__ . '/stubs/Homestead-local.yaml', $this->basePath . '/Homestead-local.yaml' );
+            }
+        }
+
+        if ($input->getOption('aliases')) {
+            if (! file_exists($this->basePath.'/aliases')) {
+                copy(__DIR__.'/stubs/aliases', $this->basePath.'/aliases');
             }
         }
 
