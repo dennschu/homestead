@@ -243,24 +243,54 @@ class Homestead
       end
     end
 
+    # Configure xdebug
     if File.exists? scriptDir + "/xdebug/xdebug-enable.sh" and local_config.include? 'xdebug'
       config.vm.provision "shell" do |s|
+          debugMode = false
           s.path = scriptDir + "/xdebug/xdebug-enable.sh"
           s.args = [
-            local_config["xdebug"]["fpm"]["enabled"],
-            local_config["xdebug"]["cli"]["enabled"],
-            "false"
+            local_config["xdebug"]["fpm"]["enabled"].to_s,
+            local_config["xdebug"]["cli"]["enabled"].to_s,
+            debugMode.to_s
           ]
       end
     end
 
-    # @todo enable xdebug profiler
-    #if File.exists? scriptDir + "/xdebug/xdebug-profiler-enable.sh"
-    #  config.vm.provision "shell" do |s|
-    #      s.path = scriptDir + "/xdebug/xdebug-profiler-enable"
-    #      s.args = [ "true", "true", "" ]
-    #  end
-    #end
+    # Configure xdebug profiler
+    if File.exists? scriptDir + "/xdebug/xdebug-enable.sh" and local_config.include? 'xdebug'
+      xdebug = local_config["xdebug"]
+      profiler = local_config["xdebug"]["profiler"]
+
+      if profiler["enabled"] == true and ( xdebug["fpm"]["enabled"] == false or xdebug["fpm"]["enabled"] == false )
+        xdebug_fpm = xdebug["fpm"]["enabled"] ? "enabled": "disabled"
+        xdebug_cli = xdebug["cli"]["enabled"] ? "enabled": "disabled"
+
+        info_message = [
+            "xdebug profiler may not work as expected because",
+            ["  ", "xdebug for fpm is:", xdebug_fpm].join(" "),
+            ["  ", "xdebug for cli is:", xdebug_cli].join(" ")
+        ].join("\n")
+
+        config.vm.provision "shell" do |s|
+            s.inline = "echo -e \"\e[31m ${1} \e[39m\""
+            s.args = [ info_message ]
+        end
+      end
+
+      if File.exists? scriptDir + "/xdebug/xdebug-profiler-enable.sh"
+        config.vm.provision "shell" do |s|
+            debugMode = false
+            s.path = scriptDir + "/xdebug/xdebug-profiler-enable.sh"
+            s.args = [
+              local_config["xdebug"]["profiler"]["enabled"].to_s,
+              local_config["xdebug"]["profiler"]["enabled"].to_s,
+              local_config["xdebug"]["profiler"]["logs"]["path"],
+              local_config["xdebug"]["profiler"]["logs"]["filename"],
+              debugMode.to_s
+            ]
+        end
+      end
+    end
 
   end
 end

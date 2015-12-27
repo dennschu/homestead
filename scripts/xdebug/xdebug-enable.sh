@@ -13,6 +13,7 @@
 #   3: "true|false" - enable script debug mode
 #===================================================================================
 
+
 #----------------------------------------------------------------------
 # Script Arguments
 #----------------------------------------------------------------------
@@ -22,6 +23,7 @@ DEBUG_MODE=""
 if [[ $3 == "true" ]]; then
   DEBUG_MODE="true"
 fi
+
 
 #----------------------------------------------------------------------
 # Script Variables
@@ -35,7 +37,6 @@ DEFAULT_CONFIG_FILENAME="xdebug.ini"
 CUSTOM_CONFIG_FILENAME_PRIO="21"
 CUSTOM_CONFIG_FILENAME="xdebug-custom-config.ini"
 CUSTOM_CONFIG=$(cat << EOT
-[XDEBUG]
 xdebug.remote_connect_back=1
 xdebug.default_enable=1
 xdebug.remote_autostart=0
