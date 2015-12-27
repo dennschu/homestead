@@ -7,7 +7,7 @@ class Homestead
     scriptDir = File.dirname(__FILE__)
 
     # Load optionally local configuration
-    local_config_path = File.expand_path( projectRootPath + '/local-vagrant-configuration.yaml')
+    local_config_path = File.expand_path( projectRootPath + '/Homestead-local.yaml')
     local_config = ( File.exists? local_config_path ) ? YAML::load(File.read( local_config_path )) : Hash.new
 
     # Prevent TTY Errors

@@ -1,0 +1,13 @@
+xdebug:
+  fpm:
+    enabled:      false
+
+  cli:
+    enabled:      false
+
+  profiler:
+    enabled:      false
+    logs:
+      path:       '/home/vagrant/project/_logs'
+      filename:   'callgrind.%R.%t'
+

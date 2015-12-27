@@ -4,6 +4,7 @@ require 'yaml'
 VAGRANTFILE_API_VERSION ||= "2"
 confDir = $confDir ||= File.expand_path("vendor/laravel/homestead", File.dirname(__FILE__))
 
+projectRootPath = File.dirname( __FILE__ )
 homesteadYamlPath = "Homestead.yaml"
 homesteadJsonPath = "Homestead.json"
 afterScriptPath = "after.sh"
@@ -17,9 +18,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
 
     if File.exists? homesteadYamlPath then
-        Homestead.configure(config, YAML::load(File.read(homesteadYamlPath)))
+        Homestead.configure(config, YAML::load(File.read(homesteadYamlPath)), "#{projectRootPath}")
     elsif File.exists? homesteadJsonPath then
-        Homestead.configure(config, JSON.parse(File.read(homesteadJsonPath)))
+        Homestead.configure(config, JSON.parse(File.read(homesteadJsonPath)), "#{projectRootPath}")
     end
 
     if File.exists? afterScriptPath then
