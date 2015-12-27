@@ -140,6 +140,7 @@ class Homestead
     end
 
     # Disable "vagrant-vbguest" plugins auto update
+    # @see https://github.com/laravel/framework/issues/11439
     if Vagrant.has_plugin?("vagrant-vbguest")
       config.vbguest.auto_update = false
     end
