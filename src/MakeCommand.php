@@ -96,7 +96,7 @@ class MakeCommand extends Command
             }
         }
 
-        if ($input->getOption('example')) {
+        if ($input->getOption('local-config')) {
             if (! file_exists($this->basePath.'/Homestead-local.yaml')) {
               copy( __DIR__ . '/stubs/Homestead-local.yaml', $this->basePath . '/Homestead-local.yaml' );
             }
