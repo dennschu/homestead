@@ -302,5 +302,14 @@ class Homestead
       end
     end
 
+    # Install WPCLI
+    if File.exists? scriptDir + "/php-tools/ubuntu1404_install-wpcli.sh" then
+      config.vm.provision "shell" do |s|
+        debugMode = true
+        s.path = scriptDir + "/php-tools/ubuntu1404_install-wpcli.sh"
+        s.args = [ debugMode.to_s ]
+      end
+    end
+
   end
 end
