@@ -159,6 +159,12 @@ adjust_permissions_for_user() {
 
 
 #----------------------------------------------------------------------
+# Message
+#----------------------------------------------------------------------
+log "### Install nano code hightlighting to: '${EXTENSION_INSTALL_PATH}'"
+
+
+#----------------------------------------------------------------------
 # Cleanup, bring system in an idompotent state
 #----------------------------------------------------------------------
 rm -rf "${EXTENSION_INSTALL_PATH}"
