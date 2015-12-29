@@ -293,5 +293,14 @@ class Homestead
       end
     end
 
+    # Install nano code highlighting
+    if File.exists? scriptDir + "/nano/ubuntu1404_add-nano-code-highlighting.sh" then
+      config.vm.provision "shell" do |s|
+        debugMode = false
+        s.path = scriptDir + "/nano/ubuntu1404_add-nano-code-highlighting.sh"
+        s.args = [ "vagrant", debugMode.to_s ]
+      end
+    end
+
   end
 end
